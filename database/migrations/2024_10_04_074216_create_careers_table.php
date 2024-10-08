@@ -14,14 +14,19 @@ return new class extends Migration
         Schema::create('careers', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('department_id');
-            $table->string(column: 'career_name');
-            $table->integer('career_amount');
-            $table->integer('career_level');
-            $table->text('career_description');
-            $table->text('career_require');
-            $table->integer('career_status');
-            $table->date('career_end_date');
+            $table->string(column: 'name');
+            $table->integer('amount');
+            $table->integer('level');
+            $table->text('description');
+            $table->text('requirements');
+            $table->text('benefits');
+            $table->float('salary_min')->nullable();
+            $table->float('salary_max')->nullable();
+            $table->boolean('negotiable')->default(true);
+            $table->boolean('status')->default(true);
+            $table->date('end_date');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

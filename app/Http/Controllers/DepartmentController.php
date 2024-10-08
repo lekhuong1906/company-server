@@ -2,22 +2,20 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Career;
-use Illuminate\Contracts\Database\Eloquent\Builder;
+use App\Models\Department;
 use Illuminate\Http\Request;
-use App\Http\Requests\CareerRequest;
 
-class CareerController extends Controller
+class DepartmentController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $data = Career::all();
+        $departments = Department::get();
         return response()->json([
             'message' => 'Success',
-            'data' => $data
+            'data' => $departments
         ]);
     }
 
@@ -32,9 +30,9 @@ class CareerController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(CareerRequest $request)
+    public function store(Request $request)
     {
-        dd($request->all());
+        //
     }
 
     /**
@@ -67,20 +65,5 @@ class CareerController extends Controller
     public function destroy(string $id)
     {
         //
-    }
-
-    public function getByDepartment($department_slug)
-    {
-        $data = Career::whereHas(
-            'department',
-            function ($query) use ($department_slug) {
-                $query->where('slug', $department_slug);
-            }
-        )->get();
-
-        return response()->json([
-            'message' => 'Success',
-            'data' => $data
-        ]);
     }
 }
