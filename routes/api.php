@@ -15,7 +15,7 @@ Route::prefix('auth')->middleware('auth:sanctum')->group(function () {
         return $request->user();
     });
     Route::apiResource('/departments', DepartmentController::class)->only('index');
-    Route::apiResource('levels', JobLevel::class)->only('index');
+    Route::apiResource('/levels', JobLevel::class)->only('index');
 });
 
 Route::post('/register', [AuthController::class, 'register']);
