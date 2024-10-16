@@ -16,4 +16,8 @@ class JobLevel extends Model
         'slug',
     ];
 
+    public function careers(){
+        return $this->hasMany(Career::class,'level','id');
+    }
+
 }

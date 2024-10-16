@@ -35,4 +35,25 @@ class Career extends Model
     {
         return $this->belongsTo(Department::class, 'department_id', 'id');
     }
+    
+    public function jobLevel(){
+        return $this->belongsTo(JobLevel::class, 'level', 'id');
+    }
+
+    public function scopeGetList($query){
+        return $query->select('id', 'name', 'department_id', 'amount', 'status', 'level')
+        ->with(['department:id,name', 'jobLevel:id,name']) // Eager load để lấy name từ bảng department và level
+        ->orderBy('id','desc')
+        ->get()
+        ->map(function ($job) {
+            return [
+                'id' => $job->id,
+                'name' => $job->name,
+                'amount' => $job->amount,
+                'status' => $job->status,
+                'department_name' => $job->department->name, // Lấy tên từ department
+                'level_name' => $job->jobLevel->name, // Lấy tên từ level
+            ];
+        });
+    }
 }

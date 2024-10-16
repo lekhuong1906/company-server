@@ -14,7 +14,7 @@ class CareerController extends Controller
      */
     public function index()
     {
-        $data = Career::all();
+        $data = Career::getList();
         return response()->json([
             'message' => 'Success',
             'data' => $data
@@ -32,9 +32,14 @@ class CareerController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(CareerRequest $request)
+    public function store(Request $request)
     {
-        dd($request->all());
+        // echo"<pre>";
+        // var_dump($request->all());
+        Career::create($request->all());
+        return response()->json([
+            'message' => 'Success',
+        ]);
     }
 
     /**

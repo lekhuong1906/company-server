@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
+// use App\Enum\TokenAbility;
 
 class AuthController extends Controller
 {
@@ -21,8 +22,12 @@ class AuthController extends Controller
                     'email' => ['The provided credentials are incorrect.'],
                 ]);
             }
+            // $access_token = $user->createToken('API TOKEN')->plainTextToken;
+            $access_token = $user->createToken('access_token');
+            //$refresh_token = $user->createToken('refresh_token', [TokenAbility::ISSUE_ACCESS_TOKEN->value], config('sanctum.rt_expiration'));
             return response()->json([
-                'token' => $user->createToken('API TOKEN')->plainTextToken,
+                'token' => $access_token->plainTextToken,
+                // 'refresh_token' => $refresh_token->plainTextToken,
                 'user' => $user,
             ]);
         } catch (ValidationException $e) {
@@ -65,5 +70,11 @@ class AuthController extends Controller
             'user' => $user,
             'token' => $token
         ], 201);
+    }
+
+    public function refresh_token(Request $request){
+        $accessToken = $request->user()->createToken('access_token', [TokenAbility::ACCESS_API->value], config('sanctum.expiration'));
+
+        return ['token' => $accessToken->plainTextToken];
     }
 }
