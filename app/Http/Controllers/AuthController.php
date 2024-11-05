@@ -11,36 +11,48 @@ use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
+     /**
+     * Get a JWT via given credentials.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function login(Request $request)
     {
         try {
-            // dump($request->all());
-            $user = User::where('email', $request->email)->first();
+            $credentials = $request->only(['email', 'password']);
 
-            if (!$user || !Hash::check($request->password, $user->password)) {
-                throw ValidationException::withMessages([
-                    'email' => ['The provided credentials are incorrect.'],
-                ]);
+            if (! $token = auth('api')->attempt($credentials)) {
+                return response()->json(['error' => 'Unauthorized'], 401);
             }
-            // $access_token = $user->createToken('API TOKEN')->plainTextToken;
-            $access_token = $user->createToken('access_token');
-            //$refresh_token = $user->createToken('refresh_token', [TokenAbility::ISSUE_ACCESS_TOKEN->value], config('sanctum.rt_expiration'));
-            return response()->json([
-                'token' => $access_token->plainTextToken,
-                // 'refresh_token' => $refresh_token->plainTextToken,
-                'user' => $user,
-            ]);
+    
+            return $this->respondWithToken($token);
         } catch (ValidationException $e) {
             return response()->json([
                 'message' => $e->getMessage(),
             ]);
         }
     }
-    public function logout(Request $request)
-    {
-        $request->user()->tokens()->delete();
 
-        return response()->json(['message' => 'Logged out'], 200);
+     /**
+     * Get the authenticated User.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function me()
+    {
+        return response()->json(Auth::user());
+    }
+
+    /**
+     * Log the user out (Invalidate the token).
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function logout()
+    {
+        Auth::logout();
+
+        return response()->json(['message' => 'Successfully logged out']);
     }
 
     public function register(Request $request)
@@ -72,9 +84,29 @@ class AuthController extends Controller
         ], 201);
     }
 
-    public function refresh_token(Request $request){
-        $accessToken = $request->user()->createToken('access_token', [TokenAbility::ACCESS_API->value], config('sanctum.expiration'));
+    /**
+     * Refresh a token.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function refresh()
+    {
+        return $this->respondWithToken(auth()->refresh());
+    }
 
-        return ['token' => $accessToken->plainTextToken];
+     /**
+     * Get the token array structure.
+     *
+     * @param  string $token
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    protected function respondWithToken($token)
+    {
+        return response()->json([
+            'access_token' => $token,
+            'token_type' => 'Bearer',
+            'expires_in' => auth('api')->factory()->getTTL() * 60
+        ]);
     }
 }

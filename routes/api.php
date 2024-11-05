@@ -10,17 +10,15 @@ use App\Models\JobLevel;
 
 Route::post('login', [AuthController::class, 'login'])->name('login');
 
-Route::prefix('auth')->middleware('auth:sanctum')->group(function () {
-    Route::post('/refresh-token', [AuthController::class, 'refresh_token']);
+Route::prefix('auth')->middleware('auth:api')->group(function () {
+    Route::post('/refresh', [AuthController::class, 'refresh']);
     Route::post('/logout', [AuthController::class, 'logout']);
-    Route::get('/user', function (Request $request) {
-        return $request->user();
-    });
+    Route::get('/me', action: [AuthController::class, 'me']);
     Route::apiResource('/departments', DepartmentController::class)->only('index');
     Route::apiResource('/levels', JobLevelController::class)->only('index');
 });
 
 Route::post('/register', [AuthController::class, 'register']);
 
-Route::resource('careers', CareerController::class)->only(['index','store']);
+Route::resource('careers', CareerController::class)->only(['index', 'store']);
 Route::get('careers/{department_slug}', [CareerController::class, 'getByDepartment'])->name('career.departmentJob');
