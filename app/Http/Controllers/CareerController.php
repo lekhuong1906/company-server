@@ -14,7 +14,8 @@ class CareerController extends Controller
      */
     public function index()
     {
-        $data = Career::getList();
+        $data = Career::getList(10000);
+        // $data = Career::take(1000)->get();
         return response()->json([
             'message' => 'Success',
             'data' => $data

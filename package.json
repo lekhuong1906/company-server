@@ -10,5 +10,10 @@
         "laravel-vite-plugin": "^1.0",
         "vite": "^5.0"
     },
-    "engines": { "node": "18.x" }
+    "engines": {
+        "node": "18.x"
+    },
+    "dependencies": {
+        "chart.js": "^4.4.6"
+    }
 }
